@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Maintenance Satellite Ngono{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --danger: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark: #2d3436;
+            --light: #f8f9fa;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--primary);
+            min-height: 100vh; 
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header { 
+            background: rgba(255,255,255,0.95); 
+            padding: 20px 0; 
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.8em; font-weight: bold; background: var(--primary); 
+                -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-link { color: #555; text-decoration: none; padding: 10px 20px; 
+                   border-radius: 25px; transition: all 0.3s; }
+        .nav-link:hover { background: var(--primary); color: white; }
+        .main-content { padding: 40px 0; }
+        .btn { 
+            display: inline-block; padding: 12px 24px; 
+            background: var(--primary); color: white; text-decoration: none; 
+            border-radius: 25px; transition: all 0.3s; font-weight: 500;
+            border: none; cursor: pointer; text-align: center;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        .btn-success { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+        .card { 
+            background: rgba(255,255,255,0.95); border-radius: 20px; 
+            padding: 30px; box-shadow: var(--shadow); 
+            backdrop-filter: blur(10px); transition: all 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+        @media (max-width: 768px) {
+            .nav { flex-direction: column; gap: 15px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">🔧 Satellite Ngono</div>
+                <div class="nav-links">
+                    <a href="{% url 'tableau_de_bord' %}" class="nav-link"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+                    <a href="{% url 'espace_commun' %}" class="nav-link"><i class="fas fa-users"></i> Espace commun</a>
+                    <a href="{% url 'deconnexion' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</body>
+</html>

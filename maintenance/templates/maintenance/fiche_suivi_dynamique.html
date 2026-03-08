@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Fiche Suivi Dynamique</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .systeme { margin: 20px 0; border: 1px solid #ccc; padding: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>📊 Fiche Suivi Dynamique</h1>
+    
+    {% for systeme in systemes %}
+        <div class="systeme">
+            <h2>{{ systeme.nom }}</h2>
+            <table>
+                <tr><th>Composant</th><th>Unité</th><th>Action</th></tr>
+                {% for comp in systeme.composants.all %}
+                <tr>
+                    <td>{{ comp.nom }}</td>
+                    <td>{{ comp.unite_mesure|default:"—" }}</td>
+                    <td><input type="number" placeholder="Valeur"></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% empty %}
+        <p>Aucun système. <a href="/gerer-systemes/">Ajouter</a></p>
+    {% endfor %}
+
+    <a href="/tableau_de_bord/">← Dashboard</a>
+</body>
+</html>

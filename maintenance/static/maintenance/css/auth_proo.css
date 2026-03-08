@@ -1,0 +1,188 @@
+/* MAINTENANCE - DESIGN INDUSTRIEL */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --primary: #1a365d;      /* Bleu nuit industriel */
+    --secondary: #2d3748;    /* Gris foncé */
+    --accent: #4299e1;       /* Bleu technique */
+    --success: #38a169;      /* Vert validation */
+    --light: #f8fafc;        /* Gris très clair */
+    --white: #ffffff;
+    --shadow: 0 10px 25px rgba(0,0,0,0.08);
+    --border: #e2e8f0;
+}
+
+body { 
+    font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, var(--light) 0%, #e6fffa 100%);
+    min-height: 100vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-container { 
+    background: var(--white); 
+    max-width: 450px; 
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* HEADER */
+.auth-header { 
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white; 
+    padding: 40px 30px; 
+    text-align: center;
+}
+
+.auth-icon { font-size: 3.5rem; margin-bottom: 15px; opacity: 0.9; }
+.auth-title { 
+    font-size: 1.9rem; 
+    font-weight: 700; 
+    margin-bottom: 5px;
+    letter-spacing: -0.02em;
+}
+.auth-subtitle { 
+    font-size: 0.95rem; 
+    opacity: 0.9; 
+    font-weight: 400;
+}
+
+/* FORM */
+.auth-form { 
+    padding: 40px 35px; 
+}
+
+.form-group { 
+    margin-bottom: 28px; 
+    position: relative;
+}
+
+.form-label { 
+    display: block; 
+    margin-bottom: 10px; 
+    font-weight: 600; 
+    color: var(--secondary);
+    font-size: 0.92rem;
+    letter-spacing: 0.5px;
+}
+
+.form-input { 
+    width: 100%; 
+    padding: 16px 20px; 
+    border: 2px solid var(--border); 
+    border-radius: 10px;
+    font-size: 1rem; 
+    background: #fafbfc;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+}
+
+.form-input:focus { 
+    outline: none; 
+    border-color: var(--accent); 
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.08);
+    transform: translateY(-1px);
+}
+
+.message-bienvenue-container {
+    text-align: center;      /* centre horizontalement le texte */
+    margin-bottom: 20px;
+}
+
+.message-bienvenue {
+    display: inline-block;   /* pour que le fond s’adapte au texte */
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #38a169;  /* vert “succès” */
+    color: rgb(20, 12, 12);
+    font-weight: 500;
+}
+
+/* STYLES POUR CHAMPS DJANGO */
+.form-input, .form-control, input[type="text"], input[type="password"] {
+    width: 100%; 
+    padding: 16px 20px; 
+    border: 2px solid var(--border); 
+    border-radius: 10px;
+    font-size: 1rem; 
+    background: #fafbfc;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+}
+
+.form-input:focus, .form-control:focus, input[type="text"]:focus, input[type="password"]:focus {
+    outline: none; 
+    border-color: var(--accent); 
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.08);
+    transform: translateY(-1px);
+}
+
+
+.submit-btn { 
+    width: 100%; 
+    padding: 18px; 
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: var(--white); 
+    border: none; 
+    border-radius: 10px;
+    font-size: 1.05rem; 
+    font-weight: 600;
+    cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+}
+
+.submit-btn:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(26, 54, 93, 0.3);
+}
+
+.auth-links { 
+    padding: 30px 35px; 
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: #fafbfc;
+}
+
+.auth-link { 
+    color: var(--accent); 
+    text-decoration: none; 
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.auth-link:hover { text-decoration: underline; }
+
+.error-message {
+    background: #fed7d7; 
+    color: #c53030; 
+    padding: 15px; 
+    border-radius: 10px; 
+    margin-bottom: 25px; 
+    border-left: 4px solid #f56565;
+    font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    body { padding: 15px; }
+    .auth-container { margin: 10px; border-radius: 12px; }
+    .auth-header { padding: 30px 25px; }
+    .auth-form { padding: 30px 25px; }
+    .auth-icon { font-size: 3rem; }
+}
+
+@media (max-width: 360px) {
+    .auth-form { padding: 25px 20px; }
+    .auth-links { padding: 25px 20px; }
+}

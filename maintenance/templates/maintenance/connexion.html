@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Satellite Ngono Maintenance</title>
+    <link rel="stylesheet" href="{% static 'maintenance/css/auth_proo.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <i class="fas fa-wrench auth-icon"></i>
+            <h1 class="auth-title">Satellite Ngono</h1>
+            <p class="auth-subtitle">Système de Gestion Maintenance</p>
+        </div>
+
+        <!-- MESSAGES D'ERREUR/SUCCÈS -->
+{% if messages %}
+    <div class="message-bienvenue-container">
+        {% for message in messages %}
+            <div class="message-bienvenue">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <!-- IDENTIFIANT -->
+            <div class="form-group">
+                <label class="form-label">Identifiant</label>
+                {{ form.username }}
+            </div>
+
+            <!-- MOT DE PASSE -->
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{% url 'inscription' %}" class="auth-link">Créer un compte</a>
+        </div>
+    </div>
+</body>
+</html>

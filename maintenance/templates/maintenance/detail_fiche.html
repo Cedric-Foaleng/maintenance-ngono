@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Détail fiche #{{ fiche.id }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'maintenance/css/detail_fiche.css' %}">
+</head>
+<body>
+  <h1>Fiche {{ fiche.type_fiche.nom }} #{{ fiche.id }}</h1>
+  <p>Contrôleur : {{ fiche.controleur.username }}</p>
+  <p>Date : {{ fiche.date_creation }}</p>
+
+  <h2>Évaluations</h2>
+  <table border="1">
+    <tr>
+      <th>Système</th>
+      <th>Composant</th>
+      <th>État</th>
+      <th>Décision</th>
+      <th>Remarque</th>
+    </tr>
+    {% for eval in evaluations %}
+    <tr>
+      <td>{{ eval.composant.systeme.nom }}</td>
+      <td>{{ eval.composant.nom }}</td>
+      <td>{{ eval.etat }}</td>
+      <td>{{ eval.decision }}</td>
+      <td>{{ eval.remarque }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p><strong>Commentaire global :</strong> {{ fiche.commentaire_global }}</p>
+
+  <p>
+    <a href="{% url 'export_pdf_fiche' fiche.id %}">Télécharger en PDF</a>
+  </p>
+
+  <h2>Avis des contrôleurs</h2>
+  <ul>
+    {% for a in avis %}
+      <li><strong>{{ a.auteur.username }}</strong> ({{ a.date_creation }}): {{ a.commentaire }}</li>
+    {% empty %}
+      <li>Aucun avis pour l’instant.</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Ajouter un avis</h3>
+  <form method="post">
+    {% csrf_token %}
+    <textarea name="commentaire" cols="60" rows="3"></textarea><br>
+    <button type="submit">Envoyer</button>
+  </form>
+
+  <p><a href="{% url 'espace_commun' %}">Retour à l’espace commun</a></p>
+</body>
+</html>

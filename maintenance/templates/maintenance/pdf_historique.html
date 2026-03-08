@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ historique.marque }} - Fiche Historique</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 11pt; 
+            margin: 0;
+            width: 100%;
+        }
+        h1 { 
+            text-align: center; 
+            color: #2c3e50; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .info-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+            font-size: 10pt;
+        }
+        .info-table th, .info-table td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            vertical-align: top;
+        }
+        .info-table th { 
+            background-color: #3498db; 
+            color: white; 
+            width: 25%;
+        }
+        .lignes-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+            font-size: 9pt;
+        }
+        .lignes-table th, .lignes-table td { 
+            border: 1px solid #ddd; 
+            padding: 6px; 
+            text-align: left; 
+        }
+        .lignes-table th { 
+            background-color: #27ae60; 
+            color: white; 
+        }
+        .signature { 
+            margin-top: 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 10pt;
+        }
+        .footer { 
+            margin-top: 30px; 
+            text-align: center; 
+            font-size: 9pt; 
+            color: #7f8c8d; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Fiche Historique des Pannes et Interventions</h1>
+    
+    <!-- ✅ DATE CORRIGÉE -->
+    <table class="info-table">
+        <tr><th>Date</th><td>{{ historique.date|date:"d/m/Y" }}</td></tr>
+        <tr><th>Marque/Véhicule</th><td>{{ historique.marque }}</td></tr>
+        <tr><th>Heures de fonctionnement</th><td>{{ historique.heure_fonctionnement }} h</td></tr>
+        <tr><th>Niveau carburant</th><td>{{ historique.niveau_carburant }}</td></tr>
+        <tr><th>Niveau huile</th><td>{{ historique.niveau_huile }}</td></tr>
+        <tr><th>Niveau eau</th><td>{{ historique.niveau_eau|default:"N/A" }}</td></tr>
+        <tr><th>Contrôleur</th><td>{{ user.username }}</td></tr>
+    </table>
+    
+    <h2>📋 Détail des interventions</h2>
+    <table class="lignes-table">
+        <thead>
+            <tr>
+                <th>Équipement</th>
+                <th>Symptômes</th>
+                <th>Travaux effectués</th>
+                <th>Méthode</th>
+                <th>Observations</th>
+                <th>Outillage/Pièces</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td>{{ ligne.equipement }}</td>
+                <td>{{ ligne.symptomes }}</td>
+                <td>{{ ligne.travaux }}</td>
+                <td>{{ ligne.get_methode_entretien_display|default:ligne.methode_entretien }}</td>
+                <td>{{ ligne.observations|default:"-" }}</td>
+                <td>{{ ligne.outillage_pieces|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">Aucune intervention</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="signature">
+        <div>
+            <p>Signature technicien :</p>
+            <p>________________________</p>
+        </div>
+        <div>
+            <p>Généré le {{ date_pdf }}</p>
+            <p>Par {{ user.username }}</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Système de gestion maintenance NGONO
+    </div>
+</body>
+</html>

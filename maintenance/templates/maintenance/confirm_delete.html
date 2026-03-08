@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmer suppression</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        .alert-danger { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="alert-danger">
+        <h3>⚠️ Confirmer la suppression</h3>
+        <p><strong>Êtes-vous sûr de vouloir supprimer :</strong></p>
+        <p><strong>{{ objet }}</strong> ?</p>
+        <p><em>Cette action est <strong>irréversible</strong></em></p>
+    </div>
+    
+    <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" onclick="return confirm('⚠️ SUPPRESSION DÉFINITIVE ?')">🗑️ OUI, Supprimer</button>
+        <a href="{% url 'espace_commun' %}" class="btn btn-secondary">❌ Annuler</a>
+    </form>
+</body>
+</html>

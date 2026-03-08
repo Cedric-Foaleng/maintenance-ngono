@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Satellite Ngono Maintenance</title>
+    <link rel="stylesheet" href="{% static 'maintenance/css/auth_proo.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <i class="fas fa-user-plus auth-icon"></i>
+            <h1 class="auth-title">Créer compte</h1>
+            <p class="auth-subtitle">Accès au système de maintenance</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message" style="margin: -20px -35px 25px -35px; border-radius: 0;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <!-- CHAMPS USERCREATIONFORM -->
+            <div class="form-group">
+                <label class="form-label">Nom d'utilisateur</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                {{ form.password1 }}
+                <small style="color: #718096; font-size: 0.85rem;">
+                    Au moins 8 caractères, une majuscule, un chiffre
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirmer mot de passe</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-user-plus"></i> Créer mon compte
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{% url 'connexion' %}" class="auth-link">J'ai déjà un compte</a>
+        </div>
+    </div>
+</body>
+</html>

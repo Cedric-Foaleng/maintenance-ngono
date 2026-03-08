@@ -1,0 +1,88 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --primary: #2c5282;
+    --success: #48bb78;
+    --warning: #ed8936;
+    --light: #f7fafc;
+    --shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
+    background: var(--light);
+    color: #2d3748;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container { max-width: 1200px; margin: 0 auto; }
+
+.header { 
+    text-align: center; 
+    background: white; 
+    padding: 40px 20px; 
+    border-radius: 12px; 
+    box-shadow: var(--shadow);
+    margin-bottom: 40px;
+}
+
+.header h1 { 
+    font-size: 2.5em; 
+    color: var(--primary); 
+    margin-bottom: 10px;
+}
+
+.stats-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 24px; 
+    margin-bottom: 50px;
+}
+
+.stat-card { 
+    background: white; 
+    padding: 30px; 
+    border-radius: 12px; 
+    text-align: center;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--primary);
+}
+
+.stat-card.success { border-left-color: var(--success); }
+.stat-card.warning { border-left-color: var(--warning); }
+
+.stat-number { font-size: 2.8em; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+.stat-label { color: #718096; font-size: 1.1em; }
+
+.fiches-grid, .nav-grid { 
+    display: grid; 
+    gap: 20px; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.fiche-btn, .nav-btn { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 12px; 
+    text-decoration: none; 
+    color: #2d3748;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: all 0.3s;
+    border-left: 5px solid var(--primary);
+    display: flex; align-items: center; gap: 15px;
+}
+
+.fiche-btn:hover, .nav-btn:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    color: var(--primary);
+}
+
+section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: var(--shadow); }
+section h2 { color: var(--primary); margin-bottom: 25px; font-size: 1.5em; }
+
+@media (max-width: 768px) {
+    .fiches-grid, .nav-grid { grid-template-columns: 1fr; }
+    body { padding: 10px; }
+}

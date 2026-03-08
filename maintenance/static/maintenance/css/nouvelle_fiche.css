@@ -1,0 +1,27 @@
+body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); min-height: 100vh; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+.header { text-align: center; color: #333; margin-bottom: 40px; padding: 30px; background: rgba(255,255,255,0.9); border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+.header h1 { font-size: 2.8em; background: linear-gradient(45deg, #667eea, #764ba2);  -webkit-text-fill-color: transparent; }
+.systeme-section { margin-bottom: 50px; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.systeme-title { font-size: 1.8em; color: #2d3436; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #667eea; }
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 15px; text-align: left; font-weight: 600; }
+td { padding: 18px 15px; border-bottom: 1px solid #f1f3f4; }
+tr:nth-child(even) { background: #f8f9fa; }
+tr:hover { background: #e3f2fd; transform: scale(1.01); }
+select, input[type="text"], textarea { 
+    width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;
+    font-size: 1em; transition: all 0.3s; background: white;
+}
+select:focus, input:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+.global-comment { margin-top: 40px; }
+.global-comment textarea { min-height: 120px; resize: vertical; font-family: inherit; }
+.submit-section { text-align: center; margin-top: 50px; padding: 40px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 20px; }
+.submit-btn { 
+    padding: 20px 50px; font-size: 1.4em; background: white; color: #00f2fe;
+    border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2); transition: all 0.3s;
+}
+.submit-btn:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+@media (max-width: 768px) { .systeme-title { font-size: 1.5em; } table { font-size: 0.9em; } }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Nouvelle fiche - {{ type_fiche.nom }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'maintenance/css/nouvelle_affiche.css' %}">
+</head>
+<body>
+  <h1>Nouvelle fiche de suivi : {{ type_fiche.nom }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for systeme in systemes %}
+      <h2>{{ systeme.nom }}</h2>
+      <table border="1">
+        <tr>
+          <th>Composant</th>
+          <th>État</th>
+          <th>Décision</th>
+          <th>Remarque</th>
+        </tr>
+        {% for comp in systeme.composants.all %}
+        <tr>
+          <td>{{ comp.nom }}</td>
+          <td>
+            <select name="etat_{{ comp.id }}">
+              <option value="">--</option>
+              <option value="BON">BON</option>
+              <option value="PASSABLE">PASSABLE</option>
+              <option value="MAUVAIS">MAUVAIS</option>
+            </select>
+          </td>
+          <td>
+            <select name="decision_{{ comp.id }}">
+              <option value="">--</option>
+              <option value="REPARER">RÉPARER</option>
+              <option value="NE_PAS_REPARER">NE PAS RÉPARER</option>
+            </select>
+          </td>
+          <td><input type="text" name="remarque_{{ comp.id }}"></td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% endfor %}
+
+    <p>Commentaire global :</p>
+    <textarea name="commentaire_global" cols="60" rows="4"></textarea><br><br>
+
+    <button type="submit">Enregistrer la fiche</button>
+  </form>
+</body>
+</html>

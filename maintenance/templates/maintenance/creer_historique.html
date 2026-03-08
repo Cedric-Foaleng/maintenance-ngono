@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle fiche historique</title>
+    <link rel="stylesheet" href="{% static 'maintenance/css/form_historique.css' %}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <!--<h1> Historique des pannes et interventions</h1>-->
+    <h1 style="text-align: center;">Historique des pannes et interventions</h1>
+
+
+    <form method="post">
+        {% csrf_token %}
+
+        <fieldset class="entete">
+            <legend>Entête</legend>
+            <div class="row">
+                <div class="field">
+                    {{ form.date.label_tag }}{{ form.date }}
+                </div>
+                <div class="field">
+                    {{ form.marque.label_tag }}{{ form.marque }}
+                </div>
+                <div class="field">
+                    {{ form.heure_fonctionnement.label_tag }}{{ form.heure_fonctionnement }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    {{ form.niveau_carburant.label_tag }}{{ form.niveau_carburant }}
+                </div>
+                <div class="field">
+                    {{ form.niveau_huile.label_tag }}{{ form.niveau_huile }}
+                </div>
+                <div class="field">
+                    {{ form.niveau_eau.label_tag }}{{ form.niveau_eau }}
+                </div>
+            </div>
+        </fieldset>
+
+        <h2>Lignes d'historique</h2>
+
+        {{ formset.management_form }}
+        <table id="lignes-table">
+            <thead>
+                <tr>
+                    <th>Équipement</th>
+                    <th>Symptômes</th>
+                    <th>Travaux exécutés</th>
+                    <th>Méthode d'entretien</th>
+                    <th>Observations</th>
+                    <th>Outillages / pièces + réf.</th>
+                    <th>Supprimer</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for form in formset %}
+                <tr class="form-row">
+                    <td>{{ form.equipement }}</td>
+                    <td>{{ form.symptomes }}</td>
+                    <td>{{ form.travaux }}</td>
+                    <td>{{ form.methode_entretien }}</td>
+                    <td>{{ form.observations }}</td>
+                    <td>{{ form.outillage_pieces }}</td>
+                    <td>
+                        {% if form.instance.pk %}
+                            {{ form.DELETE }} Suppr
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" id="add-row">+ Ajouter une ligne</button>
+
+        <div class="actions">
+            <button type="submit">Enregistrer la fiche</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Duplique la dernière ligne du formset
+    (function() {
+        const addBtn = document.getElementById('add-row');
+        const tableBody = document.querySelector('#lignes-table tbody');
+        const totalForms = document.getElementById('id_lignehistorique_set-TOTAL_FORMS');
+
+        addBtn.addEventListener('click', function() {
+            const currentFormCount = parseInt(totalForms.value);
+            const newFormIndex = currentFormCount;
+
+            const emptyRow = tableBody.querySelector('tr.form-row:last-child').cloneNode(true);
+
+            emptyRow.querySelectorAll('input, textarea, select').forEach(function(input) {
+                const name = input.name.replace(/\d+/, newFormIndex);
+                const id = 'id_' + name;
+                input.name = name;
+                input.id = id;
+                if (input.type !== 'hidden') {
+                    input.value = '';
+                }
+            });
+
+            tableBody.appendChild(emptyRow);
+            totalForms.value = newFormIndex + 1;
+        });
+    })();
+</script>
+</body>
+</html>

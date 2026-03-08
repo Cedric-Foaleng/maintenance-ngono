@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toutes les fiches - Maintenance</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'maintenance/css/liste_fiches_test.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-list"></i> Toutes les fiches</h1>
+            <p>{{ fiches.count }} fiche{{ fiches.count|pluralize }} au total</p>
+        </header>
+
+        <div class="fiches-grid">
+            {% for fiche in fiches %}
+            <div class="fiche-card">
+                <div class="fiche-header">
+                    <h3>{{ fiche.type_fiche.nom }} #{{ fiche.id }}</h3>
+                    <span class="fiche-date">{{ fiche.date_creation|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="fiche-meta">
+                    {% if fiche.controleur %}
+                        <span><i class="fas fa-user"></i> {{ fiche.controleur.username }}</span>
+                    {% endif %}
+                </div>
+                {% if fiche.commentaire_global %}
+                    <p class="fiche-comment">{{ fiche.commentaire_global|truncatewords:15 }}</p>
+                {% endif %}
+                <div class="fiche-actions">
+                    <a href="{% url 'detail_fiche' fiche.id %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Détails
+                    </a>
+                    <a href="{% url 'export_pdf_fiche' fiche.id %}" class="btn btn-pdf">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Aucune fiche</h3>
+                <p>Créez votre première fiche depuis le <a href="{% url 'tableau_de_bord' %}">tableau de bord</a></p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="page-actions">
+            <a href="{% url 'tableau_de_bord' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Tableau de bord
+            </a>
+        </div>
+    </div>
+</body>
+</html>

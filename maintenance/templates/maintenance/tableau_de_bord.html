@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - Maintenance</title>
+    <link rel="stylesheet" href="{% static 'maintenance/css/tableau_de_bord.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h1>
+            <p>Bonjour <strong>{{ user.username|upper }}</strong></p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-number">{{ nb_fiches|default:0 }}</div>
+                <div class="stat-label">Fiches créées</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-number">{{ nb_pannes|default:0 }}</div>
+                <div class="stat-label">Pannes</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-number">{{ nb_systemes|default:0 }}</div>
+                <div class="stat-label">Systèmes</div>
+            </div>
+        </div>
+
+        <section class="fiches-section">
+            <h2>📋 Créer nouvelle fiche</h2>
+            <div class="fiches-grid">
+                {% for t in types_fiche %}
+                <a href="{% url 'nouvelle_fiche' t.id %}" class="fiche-btn">
+                    <i class="fas fa-plus"></i> {{ t.nom }}
+                </a>
+                {% empty %}
+                <p>Aucun type de fiche disponible</p>
+                {% endfor %}
+                
+                <!-- ✅ NOUVEAUX BOUTONS DYNAMIQUES -->
+                <a href="{% url 'creer_fiche_suivi_dynamique' %}" class="fiche-btn">
+                    <i class="fas fa-cogs"></i> Fiche Dynamique
+                </a>
+                <a href="{% url 'creer_historique' %}" class="fiche-btn">
+                    <i class="fas fa-clipboard-list"></i> Historique Panne
+                </a>
+            </div>
+        </section>
+
+        <section class="nav-section">
+            <h2>🧭 Navigation</h2>
+            <div class="nav-grid">
+                <!-- ✅ ÉTAPE 5 : NOUVEAUX BOUTONS AJOUTÉS ICI -->
+                <a href="{% url 'liste_fiches' %}" class="nav-btn">
+                    <i class="fas fa-list"></i> Toutes fiches
+                </a>
+                
+                <a href="{% url 'liste_historiques' %}" class="nav-btn">
+                    <i class="fas fa-history"></i> Historiques pannes
+                </a>
+                
+                <!-- ✅ NOUVEAU : Gestion systèmes/composants -->
+                <a href="{% url 'gerer_systemes' %}" class="nav-btn">
+                    <i class="fas fa-cog"></i> ⚙️ Gérer systèmes
+                </a>
+                
+                <a href="{% url 'espace_commun' %}" class="nav-btn">
+                    <i class="fas fa-users"></i> 👥 Espace commun
+                </a>
+                
+                <a href="{% url 'deconnexion' %}" class="nav-btn danger">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
