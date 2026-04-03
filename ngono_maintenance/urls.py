@@ -27,12 +27,11 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('maintenance.urls')),  # ← IMPORTANT
-   # path('favicon.ico', RedirectView.as_view(url='/static/maintenance/favicon.ico')),  # ... tes urls existantes
+    path('favicon.ico', RedirectView.as_view(url='/static/maintenance/favicon.ico')),  # ... tes urls existantes
 ]
 
 # Static et media files
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 

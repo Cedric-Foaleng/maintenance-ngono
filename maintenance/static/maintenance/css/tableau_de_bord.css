@@ -86,3 +86,24 @@ section h2 { color: var(--primary); margin-bottom: 25px; font-size: 1.5em; }
     .fiches-grid, .nav-grid { grid-template-columns: 1fr; }
     body { padding: 10px; }
 }
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+}
+.btn-success {
+    background-color: #27ae60;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #219a52;
+}
+.btn-sm {
+    padding: 5px 12px;
+    font-size: 13px;
+}

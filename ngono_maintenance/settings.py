@@ -39,7 +39,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = '9_0($$=%tboiptsury*_z_zk$gajile!^3uiddvc1)%9x=*za&'
 DEBUG = True
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '192.168.22.1']
+ALLOWED_HOSTS = ['*','192.168.159.82','localhost', '127.0.0.1' ]
 
 
 
@@ -139,47 +139,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-#STATIC_URL = 'static/'
+# === DEBUG & HOSTS (LOCAL) ===
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.159.82', '0.0.0.0']
+DEBUG = True
+# === STATIC FILES (LOCAL) ===
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "maintenance" / "static",
 ]
-# Redirection après connexion
-LOGIN_REDIRECT_URL = '/tableau_de_bord/'
+STATIC_ROOT = BASE_DIR / "staticfiles_collected"
+
+# === MEDIA ===
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# === AUTHENTIFICATION ===
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'           # Accueil après login
 LOGOUT_REDIRECT_URL = '/connexion/'
 
-# URLs de connexion personnalisées
-LOGIN_URL = '/connexion/'
 
 
-#STATIC_URL = '/static/'
-"""STATICFILES_DIRS = [
-    BASE_DIR / "maintenance" / "static",
-]"""
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-# ===== RENDER.COM CONFIG (AJOUT à la fin) =====
-import dj_database_url
-import os
-
-# Database PostgreSQL Render
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
-
-# Production settings
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*.onrender.com').split(',')
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.onrender.com').split(',')
-
-# Static files
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
