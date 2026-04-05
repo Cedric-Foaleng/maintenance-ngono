@@ -39,7 +39,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = '9_0($$=%tboiptsury*_z_zk$gajile!^3uiddvc1)%9x=*za&'
 DEBUG = True
-ALLOWED_HOSTS = ['*','192.168.159.82','localhost', '127.0.0.1' ]
+ALLOWED_HOSTS = ['*','192.168.159.82','localhost', '127.0.0.1','0.0.0.0' ]
 
 
 
@@ -141,7 +141,7 @@ USE_TZ = True
 
 # === DEBUG & HOSTS (LOCAL) ===
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.159.82', '0.0.0.0']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '192.168.159.82', '0.0.0.0']
 DEBUG = True
 # === STATIC FILES (LOCAL) ===
 STATIC_URL = '/static/'

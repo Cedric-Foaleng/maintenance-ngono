@@ -68,8 +68,8 @@
       padding-bottom: 20px;
     }
     .logo {
-      height: 60px;
-      max-width: 200px;
+      height: 80px;
+      max-width: 250px;
       margin-bottom: 10px;
     }
     table {
@@ -115,14 +115,24 @@
 </head>
 <body>
   <!-- EN-TÊTE AVEC LOGO -->
-  <div class="header">
-    {% if logo_url %}
-    <img src="{{ logo_url }}" alt="Logo Entreprise" class="logo">
+  <!-- EN-TÊTE AVEC LOGO ACCUEIL -->
+<div class="header">
+    {% if logo_base64 %}
+        <img src="{{ logo_base64 }}" alt="Logo Ngono" class="logo">
+    {% else %}
+        <div class="logo">[LOGO]</div>
     {% endif %}
+    
     <h1>Fiche de suivi - {{ fiche.type_fiche.nom }}</h1>
-    <p><strong>Fiche #{{ fiche.id }}</strong> | Date: {{ fiche.date_creation|date:"d/m/Y H:i" }}</p>
-    <p><strong>Contrôleur :</strong> {{ fiche.controleur.username }}</p>
-  </div>
+    <p>Date: {{ fiche.date_creation|date:"d/m/Y H:i" }}</p>
+</div>
+
+<!-- Signature -->
+{% if signature_base64 %}
+<div class="signature-section">
+    <img src="{{ signature_base64 }}" class="signature">
+</div>
+{% endif %}
 
   <!-- TABLEAU ÉVALUATIONS (ton code existant amélioré) -->
   <table>
@@ -174,7 +184,7 @@
               <span style="font-size: 14pt; font-weight: bold;">________________________</span>
             {% endif %}
           </div>
-          <p style="font-size: 9pt; margin-top: 5px;">(Espace réservé pour signature manuscrite)</p>
+          <p style="font-size: 9pt; margin-top: 5px;">(Espace réservé pour signature )</p>
         </td>
       </tr>
     </table>

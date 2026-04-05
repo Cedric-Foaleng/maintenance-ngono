@@ -1,10 +1,16 @@
 from django.db import transaction
 from .models import TypeFiche, Systeme, Composant
 
-def load_initial_data():
+"""def load_initial_data():
     # Si au moins un type de fiche existe, on suppose que les données sont déjà chargées
     if TypeFiche.objects.exists():
+        return"""
+def load_initial_data(force=False):  # ← Ajoute force=False
+    if TypeFiche.objects.exists() and not force:
+        print("⚠️  Données existantes, passez force=True pour recharger")
         return
+    
+    # Reste du code...
 
     with transaction.atomic():
         # =========================
