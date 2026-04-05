@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -46,5 +46,138 @@
   </table>
 
   <p><strong>Commentaire global :</strong> {{ fiche.commentaire_global }}</p>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Fiche {{ fiche.type_fiche.nom }} #{{ fiche.id }}</title>
+  <style>
+    body {
+      font-family: DejaVu Sans, sans-serif;
+      font-size: 10pt;
+      margin: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 20px;
+    }
+    .logo {
+      height: 60px;
+      max-width: 200px;
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 6px 4px;
+      font-size: 9pt;
+    }
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+    .signature-section {
+      margin-top: 40px;
+      border-top: 3px solid #333;
+      padding-top: 25px;
+    }
+    .signature-table {
+      width: 100%;
+      margin-top: 15px;
+    }
+    .signature-box {
+      border-bottom: 2px solid #000;
+      width: 280px;
+      height: 70px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+    }
+    .signature-img {
+      max-height: 65px;
+      max-width: 250px;
+    }
+    .infos-signature {
+      font-size: 11pt;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- EN-TÊTE AVEC LOGO -->
+  <div class="header">
+    {% if logo_url %}
+    <img src="{{ logo_url }}" alt="Logo Entreprise" class="logo">
+    {% endif %}
+    <h1>Fiche de suivi - {{ fiche.type_fiche.nom }}</h1>
+    <p><strong>Fiche #{{ fiche.id }}</strong> | Date: {{ fiche.date_creation|date:"d/m/Y H:i" }}</p>
+    <p><strong>Contrôleur :</strong> {{ fiche.controleur.username }}</p>
+  </div>
+
+  <!-- TABLEAU ÉVALUATIONS (ton code existant amélioré) -->
+  <table>
+    <tr>
+      <th>Système</th>
+      <th>Composant</th>
+      <th>État</th>
+      <th>Décision</th>
+      <th>Remarque</th>
+    </tr>
+    {% for eval in evaluations %}
+    <tr>
+      <td>{{ eval.composant.systeme.nom }}</td>
+      <td>{{ eval.composant.nom }}</td>
+      <td>{{ eval.etat }}</td>
+      <td>{{ eval.decision }}</td>
+      <td>{{ eval.remarque|default:"-" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Aucune évaluation</td></tr>
+    {% endfor %}
+  </table>
+
+  {% if fiche.commentaire_global %}
+  <p><strong>Commentaire global :</strong> {{ fiche.commentaire_global }}</p>
+  {% endif %}
+
+  <!-- SIGNATURE EN BAS (NOUVEAU) -->
+  <div class="signature-section">
+    <h3>Validation de l'intervention</h3>
+    <table class="signature-table">
+      <tr>
+        <td style="width: 55%; vertical-align: top; padding-right: 20px;">
+          <p class="infos-signature">
+            <strong>Intervenant :</strong><br>
+            {{ intervenant_nom }}
+          </p>
+          <p class="infos-signature">
+            <strong>Date de validation :</strong><br>
+            {{ date_signature|date:"d/m/Y H:i" }}
+          </p>
+        </td>
+        <td style="width: 45%; vertical-align: bottom;">
+          <p><strong>Signature :</strong></p>
+          <div class="signature-box">
+            {% if signature_url %}
+              <img src="{{ signature_url }}" alt="Signature {{ intervenant_nom }}" class="signature-img">
+            {% else %}
+              <span style="font-size: 14pt; font-weight: bold;">________________________</span>
+            {% endif %}
+          </div>
+          <p style="font-size: 9pt; margin-top: 5px;">(Espace réservé pour signature manuscrite)</p>
+        </td>
+      </tr>
+    </table>
+  </div>
 </body>
 </html>

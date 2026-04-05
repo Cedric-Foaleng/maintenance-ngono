@@ -1,31 +1,6 @@
 # pylint: disable=undefined-variable
 
-"""from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.db import transaction
-from django.conf import settings
-from django.template.loader import get_template
-from datetime import datetime
-from .forms import HistoriquePanneForm, LigneHistoriqueFormSet
 
-import os
-
-from xhtml2pdf import pisa
-
-from .models import (
-    TypeFiche,
-    Systeme,
-    Composant,
-    FicheSuivi,
-    EvaluationComposant,
-    AvisFiche,
-   
-)"""
 
 # maintenance/views.py - IMPORTS COMPLÈTS
 # IMPORTS CORRIGÉS (en HAUT de views.py)
@@ -244,7 +219,7 @@ def detail_fiche(request, fiche_id):
 # ------------------------
 # Export PDF
 # ------------------------
-@login_required
+"""@login_required
 def export_pdf_fiche(request, fiche_id):
     fiche = get_object_or_404(FicheSuivi, id=fiche_id)
     evaluations = fiche.evaluations.select_related('composant', 'composant__systeme')
@@ -274,6 +249,61 @@ def export_pdf_fiche(request, fiche_id):
     fiche.save()
 
     return response
+"""
+@login_required
+def export_pdf_fiche(request, fiche_id):
+    fiche = get_object_or_404(FicheSuivi, id=fiche_id)
+    evaluations = fiche.evaluations.select_related('composant', 'composant__systeme')
+
+    # NOUVEAU : Logo + Signature + Intervenant
+    logo_url = f"{settings.STATIC_URL}maintenance/img/logo_entreprise.png"  # Ajuste chemin
+    signature_url = getattr(fiche, 'intervenant_signature', None)
+    if signature_url:
+        signature_url = f"{settings.MEDIA_URL}{signature_url}"
+    
+    intervenant_nom = (
+        getattr(fiche, 'intervenant_nom', None) or 
+        request.user.get_full_name() or 
+        request.user.username
+    )
+
+    template_path = 'maintenance/fiche_pdf.html'
+    context = {
+        'fiche': fiche, 
+        'evaluations': evaluations,
+        'logo_url': logo_url,
+        'signature_url': signature_url,
+        'intervenant_nom': intervenant_nom,
+        'date_signature': getattr(fiche, 'date_signature', timezone.now())
+    }
+    
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Réponse HTTP
+    response = HttpResponse(content_type='application/pdf')
+    filename = f"fiche_suivi_{fiche.id}_{intervenant_nom.replace(' ', '_')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    # Génération PDF téléchargement
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Erreur lors de la génération du PDF', status=500)
+
+    # Sauvegarde sur disque (ton code existant)
+    pdf_dir = os.path.join(settings.MEDIA_ROOT, 'fiches_pdf')
+    os.makedirs(pdf_dir, exist_ok=True)
+    pdf_path = os.path.join(pdf_dir, filename)
+    with open(pdf_path, 'wb') as f:
+        pisa.CreatePDF(html, dest=f)
+
+    # Sauvegarde chemin fichier (ton code existant)
+    fiche.fichier_pdf.name = f'fiches_pdf/{filename}'
+    fiche.save()
+
+    messages.success(request, f'✅ PDF généré avec signature : {filename}')
+    return response
+
 
 # ------------------------
 # Espace commun

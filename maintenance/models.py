@@ -73,8 +73,16 @@ class FicheSuivi(models.Model):
     commentaire_global = models.TextField(blank=True)
     fichier_pdf = models.FileField(upload_to='fiches_pdf/', null=True, blank=True)
     
-    def __str__(self):
+    """'def __str__(self):
         return f"Fiche {self.type_fiche.nom} #{self.id}"
+    """"
+    # NOUVEAU : Signature et nom intervenant
+    intervenant_nom = models.CharField(max_length=100, blank=True)
+    intervenant_signature = models.ImageField(upload_to='signatures/', blank=True, null=True)
+    date_signature = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Fiche {self.id} - {self.type_fiche.nom}"
 
 # 5️⃣ EvaluationComposant (dépend FicheSuivi + Composant)
 class EvaluationComposant(models.Model):
