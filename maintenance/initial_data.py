@@ -5,10 +5,33 @@ from .models import TypeFiche, Systeme, Composant
     # Si au moins un type de fiche existe, on suppose que les données sont déjà chargées
     if TypeFiche.objects.exists():
         return"""
-def load_initial_data(force=False):  # ← Ajoute force=False
+"""def load_initial_data(force=False):  # ← Ajoute force=False
     if TypeFiche.objects.exists() and not force:
         print("⚠️  Données existantes, passez force=True pour recharger")
+        return"""
+
+# maintenance/initial_data.py
+
+# ... ton code existant ...
+
+def load_initial_data():
+    """Cette fonction est appelée automatiquement au démarrage"""
+    from django.contrib.auth import get_user_model
+    from .models import TypeFiche, Systeme, Composant
+    
+    User = get_user_model()
+    
+    # Vérifie si déjà initialisé
+    if TypeFiche.objects.count() > 0:
+        print("ℹ️  Données déjà initialisées, rien à faire.")
         return
+    
+    print("🔄 Initialisation des données par défaut...")
+    
+    # Ton code existant pour créer types, systèmes, composants
+    # ... (laisse ton code tel quel) ...
+    
+    print("✅ Initialisation terminée !")
     
     # Reste du code...
 
