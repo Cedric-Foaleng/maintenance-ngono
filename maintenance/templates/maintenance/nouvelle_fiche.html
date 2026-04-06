@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -35,7 +35,7 @@
             <select name="decision_{{ comp.id }}">
               <option value="">--</option>
               <option value="REPARER">RÉPARER</option>
-              <option value="NE_PAS_REPARER">NE PAS RÉPARER</option>
+              <option value="NON REPARER">NON RÉPARER</option>
             </select>
           </td>
           <td><input type="text" name="remarque_{{ comp.id }}"></td>
@@ -49,5 +49,240 @@
 
     <button type="submit">Enregistrer la fiche</button>
   </form>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Nouvelle fiche - {{ type_fiche.nom }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'maintenance/css/nouvelle_affiche.css' %}">
+  <style>
+    /* Styles simples pour la zone de signature */
+    .signature-zone {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f9f9f9;
+      max-width: 600px;
+    }
+    .signature-zone label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    #signature-canvas {
+      border: 2px dashed #aaa;
+      background: #fff;
+      cursor: crosshair;
+      touch-action: none; /* Pour le tactile */
+    }
+    .signature-actions {
+      margin-top: 10px;
+    }
+    .signature-actions button {
+      margin-right: 10px;
+    }
+    .required-star {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nouvelle fiche de suivi : {{ type_fiche.nom }}</h1>
+
+  <form method="post" id="fiche-form">
+    {% csrf_token %}
+
+    {% for systeme in systemes %}
+      <h2>{{ systeme.nom }}</h2>
+      <table border="1" cellpadding="6" cellspacing="0">
+        <tr>
+          <th>Composant</th>
+          <th>État</th>
+          <th>Décision</th>
+          <th>Remarque</th>
+        </tr>
+        {% for comp in systeme.composants.all %}
+        <tr>
+          <td>{{ comp.nom }}</td>
+          <td>
+            <select name="etat_{{ comp.id }}" >
+              <option value="">--</option>
+              <option value="BON">BON</option>
+              <option value="PASSABLE">PASSABLE</option>
+              <option value="MAUVAIS">MAUVAIS</option>
+            </select>
+          </td>
+          <td>
+            <select name="decision_{{ comp.id }}" >
+              <option value="">--</option>
+              <option value="REPARER">RÉPARER</option>
+              <option value="NON REPARER">NON RÉPARER</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" name="remarque_{{ comp.id }}" style="width: 200px;">
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% endfor %}
+
+    <p style="margin-top: 20px;">
+      <label for="commentaire_global"><strong>Commentaire global :</strong></label><br>
+      <textarea name="commentaire_global" id="commentaire_global" cols="80" rows="5"></textarea>
+    </p>
+
+    <!-- ================= ZONE DE SIGNATURE NUMÉRIQUE ================= -->
+    <div class="signature-zone">
+      <label for="signataire_nom">
+        Nom du signataire <span class="required-star">*</span>
+      </label>
+      <input
+        type="text"
+        name="signataire_nom"
+        id="signataire_nom"
+        style="width: 300px; padding: 6px;"
+        placeholder="Entrez votre nom complet"
+        required
+      >
+
+      <p style="margin-top: 15px; margin-bottom: 8px;">
+        <strong>Signature numérique <span class="required-star">*</span></strong>
+        <br>
+        <small>Cliquez et signez dans le cadre ci‑dessous.</small>
+      </p>
+
+      <canvas
+        id="signature-canvas"
+        width="500"
+        height="150"
+      ></canvas>
+
+      <div class="signature-actions">
+        <button type="button" id="clear-signature">Effacer la signature</button>
+      </div>
+
+      <!-- Champ caché qui contiendra l'image en base64 -->
+      <input type="hidden" name="signature" id="signature-data" required>
+    </div>
+    <!-- ================= FIN ZONE DE SIGNATURE ================= -->
+
+    <div style="margin-top: 25px;">
+      <button type="submit" id="submit-btn">Enregistrer la fiche</button>
+      <a href="{% url 'tableau_de_bord' %}" style="margin-left: 15px;">Annuler</a>
+    </div>
+  </form>
+
+  <script>
+    // --- Gestion du canvas de signature ---
+    const canvas = document.getElementById('signature-canvas');
+    const ctx = canvas.getContext('2d');
+    const signatureDataInput = document.getElementById('signature-data');
+    const clearBtn = document.getElementById('clear-signature');
+    const submitBtn = document.getElementById('submit-btn');
+
+    let isDrawing = false;
+
+    // Configuration du trait
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+
+    // Événements souris
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    // Événements tactile (mobile)
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    function startDrawing(e) {
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    // Gestion du tactile
+    function handleTouchStart(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    }
+
+    function handleTouchMove(e) {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    }
+
+    // Effacer la signature
+    clearBtn.addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      signatureDataInput.value = '';
+    });
+
+    // Sauvegarder la signature en base64 avant soumission
+    function saveSignature() {
+      // Vérifie si le canvas est vide (optionnel, mais utile)
+      const blank = document.createElement('canvas');
+      blank.width = canvas.width;
+      blank.height = canvas.height;
+      if (canvas.toDataURL() === blank.toDataURL()) {
+        return null;
+      }
+      const dataURL = canvas.toDataURL('image/png');
+      signatureDataInput.value = dataURL;
+      return dataURL;
+    }
+
+    // Validation avant soumission
+    submitBtn.addEventListener('click', function (e) {
+      const nom = document.getElementById('signataire_nom').value.trim();
+      const signatureData = saveSignature();
+
+      if (!nom) {
+        alert('Veuillez entrer votre nom.');
+        e.preventDefault();
+        return;
+      }
+
+      if (!signatureData) {
+        alert('Veuillez signer dans le cadre avant d\'enregistrer la fiche.');
+        e.preventDefault();
+        return;
+      }
+    });
+  </script>
 </body>
 </html>

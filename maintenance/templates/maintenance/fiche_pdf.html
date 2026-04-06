@@ -127,13 +127,13 @@
     <p>Date: {{ fiche.date_creation|date:"d/m/Y H:i" }}</p>
 </div>
 
-<!-- Signature -->
+<!-- Signature 
 {% if signature_base64 %}
 <div class="signature-section">
     <img src="{{ signature_base64 }}" class="signature">
 </div>
 {% endif %}
-
+-->
   <!-- TABLEAU ÉVALUATIONS (ton code existant amélioré) -->
   <table>
     <tr>
@@ -161,33 +161,32 @@
   {% endif %}
 
   <!-- SIGNATURE EN BAS (NOUVEAU) -->
-  <div class="signature-section">
-    <h3>Validation de l'intervention</h3>
-    <table class="signature-table">
-      <tr>
-        <td style="width: 55%; vertical-align: top; padding-right: 20px;">
-          <p class="infos-signature">
-            <strong>Intervenant :</strong><br>
-            {{ intervenant_nom }}
-          </p>
-          <p class="infos-signature">
-            <strong>Date de validation :</strong><br>
-            {{ date_signature|date:"d/m/Y H:i" }}
-          </p>
-        </td>
-        <td style="width: 45%; vertical-align: bottom;">
-          <p><strong>Signature :</strong></p>
-          <div class="signature-box">
-            {% if signature_url %}
-              <img src="{{ signature_url }}" alt="Signature {{ intervenant_nom }}" class="signature-img">
-            {% else %}
-              <span style="font-size: 14pt; font-weight: bold;">________________________</span>
-            {% endif %}
-          </div>
-          <p style="font-size: 9pt; margin-top: 5px;">(Espace réservé pour signature )</p>
-        </td>
-      </tr>
-    </table>
-  </div>
-</body>
-</html>
+  <!-- SIGNATURE EN BAS (VERSION CORRIGÉE AVEC BASE64) -->
+<div class="signature-section">
+  <h3>Validation de l'intervention</h3>
+  <table class="signature-table">
+    <tr>
+      <td style="width: 55%; vertical-align: top; padding-right: 20px;">
+        <p class="infos-signature">
+          <strong>Intervenant :</strong><br>
+          {{ intervenant_nom|default:"-" }}
+        </p>
+        <p class="infos-signature">
+          <strong>Date de validation :</strong><br>
+          {{ date_signature|date:"d/m/Y H:i" }}
+        </p>
+      </td>
+      <td style="width: 45%; vertical-align: bottom;">
+        <p><strong>Signature :</strong></p>
+        <div class="signature-box">
+          {% if signature_base64 %}
+            <img src="{{ signature_base64 }}" alt="Signature" class="signature-img">
+          {% else %}
+            <span style="font-size: 14pt; font-weight: bold;">________________________</span>
+          {% endif %}
+        </div>
+        <p style="font-size: 9pt; margin-top: 5px;">(Espace réservé pour signature)</p>
+      </td>
+    </tr>
+  </table>
+</div>

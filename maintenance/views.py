@@ -13,6 +13,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.http import HttpResponse, HttpResponseForbidden
 from django.db import transaction
+from django.core.files.base import ContentFile  # ← CETTE LIGNE MANQUAIT
+from django.core.files.storage import default_storage
 from django.template.loader import render_to_string, get_template
 from django.utils import timezone
 from django.conf import settings
@@ -141,7 +143,7 @@ def liste_fiches(request):
     return render(request, 'maintenance/liste_fiches.html', {'fiches': fiches})
 
 
-@login_required
+"""@login_required
 def nouvelle_fiche(request, typefiche_id):
     type_fiche = get_object_or_404(TypeFiche, id=typefiche_id)
     systemes = type_fiche.systemes.prefetch_related('composants')
@@ -172,7 +174,86 @@ def nouvelle_fiche(request, typefiche_id):
         'type_fiche': type_fiche,
         'systemes': systemes,
     })
+"""
 
+@login_required
+def nouvelle_fiche(request, typefiche_id):
+    type_fiche = get_object_or_404(TypeFiche, id=typefiche_id)
+    systemes = type_fiche.systemes.prefetch_related('composants')
+
+    if request.method == 'POST':
+        with transaction.atomic():
+            # 1. Création de la fiche (sans signature pour l'instant)
+            fiche = FicheSuivi.objects.create(
+                type_fiche=type_fiche,
+                controleur=request.user,
+                commentaire_global=request.POST.get('commentaire_global', '')
+            )
+
+            # 2. Collecte des évaluations SEULEMENT si la ligne est remplie
+            evaluations_creees = 0
+
+            for systeme in systemes:
+                for composant in systeme.composants.all():
+                    etat = request.POST.get(f"etat_{composant.id}", "").strip()
+                    decision = request.POST.get(f"decision_{composant.id}", "").strip()
+                    remarque = request.POST.get(f"remarque_{composant.id}", "").strip()
+
+                    # On ne crée l'évaluation que si état ET décision sont remplis
+                    if etat and decision:
+                        EvaluationComposant.objects.create(
+                            fiche=fiche,
+                            composant=composant,
+                            etat=etat,
+                            decision=decision,
+                            remarque=remarque
+                        )
+                        evaluations_creees += 1
+
+            # 3. Validation minimale : au moins une ligne remplie
+            if evaluations_creees == 0:
+                # Annule tout et renvoie une erreur
+                from django.contrib import messages
+                messages.error(
+                    request,
+                    "Vous devez remplir au moins une ligne (état + décision) avant d'enregistrer."
+                )
+                # On supprime la fiche créée (transaction.atomic annule déjà les évaluations)
+                fiche.delete()
+                # On réaffiche le formulaire avec les données saisies
+                return render(request, 'maintenance/nouvelle_fiche.html', {
+                    'type_fiche': type_fiche,
+                    'systemes': systemes,
+                })
+
+            # 4. Gestion de la signature numérique dessinée
+            signataire_nom = request.POST.get('signataire_nom', '').strip()
+            signature_dataurl = request.POST.get('signature', '').strip()
+
+            # Si le client a signé et renseigné son nom
+            if signature_dataurl and signataire_nom:
+                if signature_dataurl.startswith('data:image/png;base64,'):
+                    format_str, imgstr = signature_dataurl.split(';base64,', 1)
+                    ext = format_str.split('/')[-1]
+
+                    filename = f"sig_{request.user.id}_{fiche.id}_{timezone.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                    image_data = base64.b64decode(imgstr)
+                    content_file = ContentFile(image_data, name=filename)
+                    saved_path = default_storage.save(f"signatures/{filename}", content_file)
+
+                    fiche.signataire_nom = signataire_nom
+                    fiche.signature = saved_path
+                    fiche.date_signature = timezone.now()
+                    fiche.save()
+
+        # Si on arrive ici, au moins une évaluation a été créée → succès
+        return redirect('detail_fiche', fiche_id=fiche.id)
+
+    # Affichage du formulaire (GET)
+    return render(request, 'maintenance/nouvelle_fiche.html', {
+        'type_fiche': type_fiche,
+        'systemes': systemes,
+    })
 
 @login_required
 def detail_fiche(request, fiche_id):
@@ -211,7 +292,7 @@ def link_callback(uri, rel):
     return None
 
 
-@login_required
+"""@login_required
 def export_pdf_fiche(request, fiche_id):
     fiche = get_object_or_404(FicheSuivi, id=fiche_id)
     evaluations = fiche.evaluations.select_related('composant', 'composant__systeme')
@@ -248,7 +329,62 @@ def export_pdf_fiche(request, fiche_id):
         return HttpResponse('Erreur PDF', status=500)
 
     return response
+"""
 
+@login_required
+def export_pdf_fiche(request, fiche_id):
+    fiche = get_object_or_404(FicheSuivi, id=fiche_id)
+    evaluations = fiche.evaluations.select_related('composant', 'composant__systeme')
+
+    # --- 1. Logo BASE64 (déjà existant) ---
+    logo_base64 = None
+    for path in [
+        os.path.join(settings.STATIC_ROOT, 'maintenance/img/logo_ngono.png'),
+        os.path.join(settings.STATIC_ROOT, 'maintenance/img/logo_entreprise.png')
+    ]:
+        if os.path.exists(path):
+            try:
+                with open(path, 'rb') as f:
+                    logo_base64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
+                break
+            except Exception:
+                continue
+
+    # --- 2. SIGNATURE DESSINÉE EN BASE64 (NOUVEAU) ---
+    signature_base64 = None
+    if fiche.signature:
+        try:
+            # Construit le chemin absolu vers le fichier signature
+            signature_path = default_storage.path(fiche.signature.name)
+            if os.path.exists(signature_path):
+                with open(signature_path, 'rb') as f:
+                    signature_data = f.read()
+                    signature_base64 = f"data:image/png;base64,{base64.b64encode(signature_data).decode('utf-8')}"
+        except Exception:
+            signature_base64 = None
+
+    # --- 3. Contexte complet ---
+    context = {
+        'fiche': fiche,
+        'evaluations': evaluations,
+        'logo_base64': logo_base64,
+        'signature_base64': signature_base64,  # ← C'EST ÇA QUI MANQUAIT
+        'intervenant_nom': fiche.signataire_nom or request.user.username,
+        'date_signature': fiche.date_signature or fiche.date_creation,
+    }
+
+    # --- 4. Génération du PDF ---
+    html = render_to_string('maintenance/fiche_pdf.html', context)
+    
+    response = HttpResponse(content_type='application/pdf')
+    filename = f"fiche_{fiche.id}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    if pisa_status.err:
+        return HttpResponse('Erreur PDF', status=500)
+
+    return response
 
 # ==================== ESPACE COMMUN ====================
 
@@ -271,7 +407,7 @@ def espace_commun(request):
         'nb_fiches': fiches.count()
     })
 
-
+"""
 @login_required
 def creer_historique(request):
     if request.method == 'POST':
@@ -291,8 +427,46 @@ def creer_historique(request):
         'form': form,
         'formset': formset,
     })
+"""
 
+@login_required
+def creer_historique(request):
+    if request.method == 'POST':
+        form = HistoriquePanneForm(request.POST)
+        formset = LigneHistoriqueFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            historique = form.save(commit=False)
+            historique.controleur = request.user
 
+            # ---- Gestion de la signature numérique ----
+            signataire_nom = request.POST.get('signataire_nom', '').strip()
+            signature_dataurl = request.POST.get('signature', '').strip()
+
+            if signature_dataurl and signataire_nom:
+                if signature_dataurl.startswith('data:image/png;base64,'):
+                    format_str, imgstr = signature_dataurl.split(';base64,', 1)
+                    ext = format_str.split('/')[-1]
+                    filename = f"sig_panne_{request.user.id}_{timezone.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                    image_data = base64.b64decode(imgstr)
+                    content_file = ContentFile(image_data, name=filename)
+                    saved_path = default_storage.save(f"signatures_panne/{filename}", content_file)
+
+                    historique.signataire_nom = signataire_nom
+                    historique.signature = saved_path
+                    historique.date_signature = timezone.now()
+
+            historique.save()
+
+            formset.instance = historique
+            formset.save()
+            return redirect('tableau_de_bord')
+    else:
+        form = HistoriquePanneForm()
+        formset = LigneHistoriqueFormSet()
+    return render(request, 'maintenance/creer_historique.html', {
+        'form': form,
+        'formset': formset,
+    })
 # ==================== HISTORIQUES PANNES ====================
 
 @login_required
@@ -316,19 +490,51 @@ def render_to_pdf(template_src, context_dict):
     return None
 
 
+
 @login_required
 def pdf_historique(request, pk):
-    """Génère PDF fiche historique ET l'envoie à l'espace commun"""
     try:
         historique = get_object_or_404(HistoriquePanne, pk=pk)
     except Exception:
         return HttpResponse("Modèle HistoriquePanne non disponible", status=500)
     
+    lignes = historique.lignes.all()
+
+    # --- 1. Logo BASE64 ---
+    logo_base64 = None
+    for path in [
+        os.path.join(settings.STATIC_ROOT, 'maintenance/img/logo_ngono.png'),
+        os.path.join(settings.STATIC_ROOT, 'maintenance/img/logo_entreprise.png')
+    ]:
+        if os.path.exists(path):
+            try:
+                with open(path, 'rb') as f:
+                    logo_base64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
+                break
+            except Exception:
+                continue
+
+    # --- 2. Signature DESSINÉE en BASE64 ---
+    signature_base64 = None
+    if historique.signature:
+        try:
+            signature_path = default_storage.path(historique.signature.name)
+            if os.path.exists(signature_path):
+                with open(signature_path, 'rb') as f:
+                    signature_data = f.read()
+                    signature_base64 = f"data:image/png;base64,{base64.b64encode(signature_data).decode('utf-8')}"
+        except Exception:
+            signature_base64 = None
+
     context = {
         'historique': historique,
-        'lignes': historique.lignes.all(),
+        'lignes': lignes,
         'user': request.user,
-        'date_pdf': datetime.now().strftime('%d/%m/%Y %H:%M')
+        'date_pdf': datetime.now().strftime('%d/%m/%Y %H:%M'),
+        'logo_base64': logo_base64,
+        'signature_base64': signature_base64,
+        'intervenant_nom': historique.signataire_nom or request.user.username,
+        'date_signature': historique.date_signature or historique.date,
     }
     
     # 1. GÉNÉRER PDF
@@ -342,7 +548,7 @@ def pdf_historique(request, pk):
     filename = f"historique_{historique.marque.replace(' ', '_')}_{historique.id}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
-    # 3. ENVOYER à ESPACE COMMUN par email
+    # 3. ENVOYER à ESPACE COMMUN par email (ton code existant)
     try:
         subject = f"🛠️ Fiche Historique - {historique.marque}"
         body = f"""Nouvelle fiche historique partagée par {request.user.username} :
@@ -368,8 +574,6 @@ PDF en pièce jointe."""
         messages.warning(request, f"✅ PDF généré mais erreur envoi email: {str(e)}")
     
     return response
-
-
 @login_required
 def supprimer_historique(request, pk):
     """Supprimer un historique panne"""

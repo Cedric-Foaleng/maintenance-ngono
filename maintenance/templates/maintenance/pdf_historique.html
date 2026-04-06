@@ -14,12 +14,21 @@
             margin: 0;
             width: 100%;
         }
-        h1 { 
-            text-align: center; 
-            color: #2c3e50; 
-            border-bottom: 3px solid #3498db; 
-            padding-bottom: 10px;
+        .header {
+            text-align: center;
             margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        .logo {
+            height: 70px;
+            max-width: 200px;
+            margin-bottom: 10px;
+        }
+        h1 { 
+            color: #2c3e50; 
+            margin: 10px 0;
+            font-size: 16pt;
         }
         .info-table { 
             width: 100%; 
@@ -52,11 +61,27 @@
             background-color: #27ae60; 
             color: white; 
         }
-        .signature { 
-            margin-top: 40px; 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 10pt;
+        .signature-section {
+            margin-top: 40px;
+            border-top: 3px solid #333;
+            padding-top: 25px;
+            page-break-inside: avoid;
+        }
+        .signature-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+        .signature-box {
+            border-bottom: 2px solid #000;
+            width: 280px;
+            height: 70px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        .signature-img {
+            max-height: 65px;
+            max-width: 250px;
         }
         .footer { 
             margin-top: 30px; 
@@ -67,9 +92,16 @@
     </style>
 </head>
 <body>
-    <h1>Fiche Historique des Pannes et Interventions</h1>
+
+    <!-- ================= EN-TÊTE AVEC LOGO ================= -->
+    <div class="header">
+        {% if logo_base64 %}
+            <img src="{{ logo_base64 }}" alt="Logo Ngono" class="logo">
+        {% endif %}
+        <h1>Fiche Historique des Pannes et Interventions</h1>
+    </div>
     
-    <!-- ✅ DATE CORRIGÉE -->
+    <!-- ================= INFORMATIONS GÉNÉRALES ================= -->
     <table class="info-table">
         <tr><th>Date</th><td>{{ historique.date|date:"d/m/Y" }}</td></tr>
         <tr><th>Marque/Véhicule</th><td>{{ historique.marque }}</td></tr>
@@ -77,9 +109,10 @@
         <tr><th>Niveau carburant</th><td>{{ historique.niveau_carburant }}</td></tr>
         <tr><th>Niveau huile</th><td>{{ historique.niveau_huile }}</td></tr>
         <tr><th>Niveau eau</th><td>{{ historique.niveau_eau|default:"N/A" }}</td></tr>
-        <tr><th>Contrôleur</th><td>{{ user.username }}</td></tr>
+        <tr><th>Contrôleur</th><td>{{ historique.controleur.username|default:user.username }}</td></tr>
     </table>
     
+    <!-- ================= DÉTAIL DES INTERVENTIONS ================= -->
     <h2>📋 Détail des interventions</h2>
     <table class="lignes-table">
         <thead>
@@ -108,19 +141,39 @@
         </tbody>
     </table>
     
-    <div class="signature">
-        <div>
-            <p>Signature technicien :</p>
-            <p>________________________</p>
-        </div>
-        <div>
-            <p>Généré le {{ date_pdf }}</p>
-            <p>Par {{ user.username }}</p>
-        </div>
-    </div>
+   <!-- ================= SIGNATURE NUMÉRIQUE EN BAS ================= -->
+<div class="signature-section">
+    <h3 style="margin-bottom: 15px; font-size: 12pt;">Validation de l'intervention</h3>
+    <table class="signature-table">
+        <tr>
+            <td style="width: 55%; vertical-align: top; padding-right: 20px;">
+                <p style="font-size: 11pt; font-weight: bold; margin: 5px 0;">
+                    <strong>Intervenant :</strong><br>
+                    {{ intervenant_nom|default:historique.controleur.username|default:"-" }}
+                </p>
+                <p style="font-size: 11pt; font-weight: bold; margin: 5px 0;">
+                    <strong>Date de validation :</strong><br>
+                    {{ date_signature|date:"d/m/Y" }}
+                </p>
+            </td>
+            <td style="width: 45%; vertical-align: bottom;">
+                <p style="font-weight: bold; margin-bottom: 5px;"><strong>Signature :</strong></p>
+                <div class="signature-box">
+                    {% if signature_base64 %}
+                        <img src="{{ signature_base64 }}" alt="Signature" class="signature-img">
+                    {% else %}
+                        <span style="font-size: 14pt; font-weight: bold;">________________________</span>
+                    {% endif %}
+                </div>
+                <p style="font-size: 9pt; margin-top: 5px; color: #555;">(Espace réservé pour signature)</p>
+            </td>
+        </tr>
+    </table>
+</div>
     
+    <!-- ================= PIED DE PAGE ================= -->
     <div class="footer">
-        Système de gestion maintenance NGONO
+        Système de gestion maintenance NGONO - Généré le {{ date_pdf }}
     </div>
 </body>
 </html>

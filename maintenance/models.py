@@ -12,7 +12,7 @@ ETAT_CHOICES = [
 
 DECISION_CHOICES = [
     ('REPARER', 'Réparer'),
-    ('NE_PAS_REPARER', 'Ne pas réparer'),
+    ('NON_REPARER', 'Non réparer'),
 ]
 
 METHODE_CHOICES = [
@@ -66,13 +66,13 @@ class Composant(models.Model):
         return f"{self.systeme.nom} - {self.nom}"
 
 # 4️⃣ FicheSuivi (dépend TypeFiche)
-class FicheSuivi(models.Model):
+"""class FicheSuivi(models.Model):
     type_fiche = models.ForeignKey(TypeFiche, on_delete=models.CASCADE, related_name='fiches')
     controleur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     commentaire_global = models.TextField(blank=True)
     fichier_pdf = models.FileField(upload_to='fiches_pdf/', null=True, blank=True)
-    
+
     # NOUVEAU : Signature et nom intervenant
     intervenant_nom = models.CharField(max_length=100, blank=True)
     intervenant_signature = models.ImageField(upload_to='signatures/', blank=True, null=True)
@@ -80,6 +80,22 @@ class FicheSuivi(models.Model):
     
     def __str__(self):
         return f"Fiche {self.id} - {self.type_fiche.nom}"
+"""
+# maintenance/models.py
+
+class FicheSuivi(models.Model):
+    type_fiche = models.ForeignKey(TypeFiche, on_delete=models.CASCADE)
+    controleur = models.ForeignKey(User, on_delete=models.CASCADE)
+    commentaire_global = models.TextField()
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    # ---- Ajout de la signature numérique dessinée
+    signataire_nom = models.CharField("Nom du signataire", max_length=100, blank=True)
+    signature = models.ImageField("Signature numérique", upload_to="signatures/", blank=True, null=True)
+    date_signature = models.DateTimeField("Date de signature", blank=True, null=True)
+
+    def __str__(self):
+        return f"Fiche {self.type_fiche.nom} - {self.id}"
 
 # 5️⃣ EvaluationComposant (dépend FicheSuivi + Composant)
 class EvaluationComposant(models.Model):
@@ -117,8 +133,16 @@ class HistoriquePanne(models.Model):
     controleur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     
+    # Ajout de la signature numérique
+    signataire_nom = models.CharField("Nom du signataire", max_length=100, blank=True)
+    signature = models.ImageField("Signature numérique", upload_to="signatures_panne/", blank=True, null=True)
+    date_signature = models.DateTimeField("Date de signature", blank=True, null=True)
+
     def __str__(self):
         return f"{self.marque} - {self.date}"
+
+
+
 
 # 8️⃣ LigneHistorique (dépend HistoriquePanne)
 class LigneHistorique(models.Model):
